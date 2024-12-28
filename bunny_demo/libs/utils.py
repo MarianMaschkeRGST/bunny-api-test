@@ -1,14 +1,28 @@
 # reference
 # https://github.com/BunnyWay/bunnystream-api-python
-
+import os
+from dotenv import load_dotenv
 import requests, json, base64
+
+# Load environment variables from .env file
+load_dotenv()
+
+# Check for required environment variables
+required_env_vars = [
+	'BUNNYCDN_LIBRARY_ID',
+	'BUNNYCDN_API_KEY',
+]
 
 class BunnyCDNStream:
 
 	base_url = "http://video.bunnycdn.com/library/"
-	stream_library_id = "359808"
-	_api_key = "9cb58b76-8f08-4aac-b4ae8d87074d-7682-4653"
+	stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
+	_api_key = os.getenv('BUNNYCDN_API_KEY', '')
 	_headers = {}
+
+	for var in required_env_vars:
+		if not os.getenv(var):
+			raise Exception(f'{var} environment variable is not set.')
 
 	def __init__(self, stream_library_id, api_key):
 		self.stream_library_id = stream_library_id

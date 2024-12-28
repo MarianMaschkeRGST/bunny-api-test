@@ -1,16 +1,22 @@
-from django.core.files.storage import FileSystemStorage
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
-from django.views.decorators.http import require_http_methods
-
-from .forms import VideoUploadForm
-from libs.utils import BunnyCDNStream
-
 import sys
 import ffmpeg
 import os
-import cloudinary
 from dotenv import load_dotenv
+from typing import Any, Dict
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.files.storage import FileSystemStorage
+from django_filters.views import FilterView
+from django.http import HttpResponse
+from django.shortcuts import redirect, render
+from django.views.generic import DetailView, TemplateView, DeleteView
+from django.views.generic.edit import FormView, UpdateView
+from django.views.decorators.http import require_http_methods
+
+from .forms import VideoUploadForm
+from .models import Course, Video
+from libs.utils import BunnyCDNStream
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -25,37 +31,47 @@ for var in required_env_vars:
     if not os.getenv(var):
         raise Exception(f'{var} environment variable is not set.')
 
-def index(request):
-    return render(request, 'videos/index.html')
+# Views
+# def index(request):
+#     return render(request, 'videos/index.html')
 
-class VideoListview(LoginRequiredMixin, TemplateView):
-    template_name = "videos/index"
 
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context = super().get_context_data(**kwargs)
+# class VideoListview(LoginRequiredMixin, TemplateView):
+#     template_name = "videos/index"
 
-        try:
-            # Get Video collection from bunny
-            # Initialize BunnyCDN client
-            stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
-            api_key = os.getenv('BUNNYCDN_API_KEY', '')
+#     def get_context_data(self, **kwargs) -> dict[str, Any]:
+#         context = super().get_context_data(**kwargs)
+
+#         try:
+#             # Get Video collection from bunny
+#             # Initialize BunnyCDN client
+#             stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
+#             api_key = os.getenv('BUNNYCDN_API_KEY', '')
             
-            client = BunnyCDNStream(stream_library_id, api_key)
+#             client = BunnyCDNStream(stream_library_id, api_key)
 
-            # Create video entry
-            response = client.list_videos(collection_id="bda9f79b-419d-46ff-b19b-c3808870befc")
+#             # Create video entry
+#             response = client.list_videos(collection_id="bda9f79b-419d-46ff-b19b-c3808870befc")
 
-            videos = []
+#             videos = []
 
-            context.update(response)
+#             context.update(response)
                             
-        except Exception as e:
-            print(f"Error fetching PayPal invoices: {str(e)}")
-            if hasattr(e, 'response'):
-                print(f"Response Status: {e.response.status_code}")
-                print(f"Response Body: {e.response.text}")
+#         except Exception as e:
+#             print(f"Error fetching PayPal invoices: {str(e)}")
+#             if hasattr(e, 'response'):
+#                 print(f"Response Status: {e.response.status_code}")
+#                 print(f"Response Body: {e.response.text}")
                 
-            return context
+#             return context
+
+class CourseIndexView(LoginRequiredMixin, FilterView):
+    
+    paginate_by = None
+    template_name = "elearning/courses/index.html"
+    model = Course
+    queryset = Course.objects.all().order_by('-created_at')
+
         
 def create_and_upload_video(title, collection_id, file_path=None):
     """

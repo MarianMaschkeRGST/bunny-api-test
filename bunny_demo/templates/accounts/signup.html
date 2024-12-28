@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+ 
+{% block content %}
+<h1>Sign up</h1>
+<section class="common-form">
+    <form method="post">
+        {% csrf_token %}
+        {{ form|crispy }}
+        <button type="submit" class="submit">新規登録</button>
+    </form>
+</section>
+{% endblock %}
