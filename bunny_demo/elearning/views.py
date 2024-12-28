@@ -14,6 +14,7 @@ from django.views.generic.edit import FormView, UpdateView
 from django.views.decorators.http import require_http_methods
 
 from .forms import VideoUploadForm
+from .filters import CourseFilter
 from .models import Course, Video
 from libs.utils import BunnyCDNStream
 
@@ -72,7 +73,45 @@ class CourseIndexView(LoginRequiredMixin, FilterView):
     model = Course
     queryset = Course.objects.all().order_by('-created_at')
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
         
+        # Get courses with related videos in a single query
+        courses = context['object_list']
+        course_data = {}
+        
+        for course in courses:
+            course_videos = Video.objects.filter(course=course)
+            course_data[course.id] = {
+                'videos': course_videos.order_by('-created_at'),
+                'video_count': course_videos.count(),
+                'total_duration': course_videos.aggregate(
+                    total_duration=models.Sum('duration')
+                )['total_duration'] or 0
+            }
+            
+        context['course_data'] = course_data
+        return context
+
+    # For django-filter
+    filterset_class = CourseFilter
+    strict = False
+
+class CustomerDetailView(LoginRequiredMixin, DetailView):
+
+    template_name = "elearning/courses/single.html"
+    model = Course
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Get facilities
+        course_videos = Video.objects.filter(course=context['course'])
+        context['videos'] = course_videos.order_by('-created_at')
+        context['course_duration'] = course_videos.count()
+        context['video_total'] = course_videos.aggregate('duration')
+        return context
+
 def create_and_upload_video(title, collection_id, file_path=None):
     """
     Creates and optionally uploads a video to BunnyCDN.

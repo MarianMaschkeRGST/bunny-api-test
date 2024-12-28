@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div>
+  <h1>講座詳細</h1>
+
+  {% comment %} <div class="fixed-button">
+    <a href="{% url 'management:customers_add' %}"><i class="fas fa-plus"></i></a>
+  </div> {% endcomment %}
+
+  <section class="customer-detail">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <table class="table table-bordered">
+          <tbody>
+            <tr>
+              <th class="table-secondary">顧客種別</th>
+              <td>{{ object.get_customer_type_display }}</td>
+            </tr>
+            <tr>
+              <th class="table-secondary">支払い方法</th>
+              <td>
+                {{ object.get_payment_method_type_display }}
+                {% if object.payment_method_description %}
+                  ({{ object.payment_method_description }})
+                {% endif %}
+              </td>
+            </tr>
+            <tr>
+              <th class="table-secondary">顧客名</th>
+              <td>{{ object.name }} ({{ object.name_kana }})</td>
+            </tr>
+            <tr>
+              <th class="table-secondary">先方担当者名</th>
+              <td>{{ object.contact_person_name }}</td>
+            </tr>
+            <tr>
+              <th class="table-secondary">住所</th>
+              <td>{{ object.address }}</td>
+            </tr>
+            <tr>
+              <th class="table-secondary">電話番号</th>
+              <td>{{ object.phone_number }}</td>
+            </tr>
+            <tr>
+              <th class="table-secondary">メール</th>
+              <td>{{ object.email }}</td>
+            </tr>
+            <tr>
+              <th class="table-secondary">課税事業者</th>
+              <td>{{ object.taxed_company_display }}</td>
+            </tr>
+            <tr>
+              <th class="table-secondary">税率</th>
+              <td>{{ object.tax_rate }}%</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="text-center">
+          <a class="btn btn-warning btn-lg" href="{% url 'management:customers_update' object.pk %}" role="button">修正</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="customer-facilities">
+    <h2>詳細一覧</h2>
+
+    {% if facilities|length == 0 %}
+      <p>該当する詳細事項が存在しません。</p>
+    {% else %}
+      <table class="table">
+        <thead class="thead-light">
+          <tr>
+            <th>ID</th>
+            <th>詳細事項</th>
+            <th>備考</th>
+            <th></th>
+          </tr>
+        </thead>
+
+        <tbody>
+        {% for facility in facilities %}
+          <tr class="{% if not facility.is_active %}table-dark{% endif %}">
+            <td>{{ facility.pk }}</td>
+            <td>{{ facility.name }}</td>
+            <td>{{ facility.description }}</td>
+            <td class="text-right">
+              <div class="btn-group" role="group" aria-label="row-button-group">
+                <a class="btn btn-warning btn-sm" href="{% url 'management:customers_facilities_update' object.pk facility.pk %}" role="button">編集</a>
+              </div>
+            </td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    <div class="text-center">
+      <a class="btn btn-primary btn-lg" href="{% url 'management:customers_facilities_add' object.pk %}" role="button">詳細追加</a>
+    </div>
+  </section>
+
+</div>
+{% endblock %}

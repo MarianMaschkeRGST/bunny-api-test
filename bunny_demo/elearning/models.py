@@ -36,6 +36,10 @@ class Video(models.Model):
         verbose_name='動画タイトル',
         max_length=256,
     )
+    duration = models.IntegerField(
+        verbose_name='時間（分）',
+        default=0
+    )
     description = models.TextField(
         verbose_name='備考',
         default='',
@@ -51,4 +55,4 @@ class Video(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.title

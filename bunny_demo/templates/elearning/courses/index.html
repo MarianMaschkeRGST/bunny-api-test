@@ -1,1 +1,40 @@
-<h1>Ello Govna</h1>
+{% extends 'base.html' %}
+ 
+{% block content %}
+<div>
+  <h1>講座</h1>
+  <div>
+    {% comment %} <a href="{% url 'management:customers_add' %}"><i class="fas fa-plus"></i></a> {% endcomment %}
+  </div>
+
+  <section>
+    {% if object_list|length == 0 %}
+      <p>該当する顧客が存在しません。</p>
+    {% else %}
+    <table>
+        <tr>
+            <thead>
+                <th>PK</th>
+                <th>講座名</th>
+                <th>Collection id</th>
+                <th>動画数</th>
+                <th>登録日</th>
+                <th>更新日</th>
+            </thead>
+            <tbody>
+                {% for course in object_list %}
+                <tr>
+                  <td>{{ course.pk }}</td>
+                  <td>{{ course.name }}</td>
+                  <td>{{ course.bunny_collection_id }}</td>
+                  <td>{{ course.created_at }}</td>
+                  <td>{{ course.updated_at }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+        </tr>
+    </table>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
