@@ -1,0 +1,8 @@
+# 1.Setup
+
+Create .env file in project root
+
+```
+BUNNYCDN_LIBRARY_ID='ID OF your bunny project library.'
+BUNNYCDN_API_KEY='API key for the STREAM APP in bunny account. Different from normal API key.'
+```
