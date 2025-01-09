@@ -28,6 +28,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# Set title
+if os.environ.get('BUNNYCDN_LIBRARY_ID') is not None:
+    BUNNYCDN_LIBRARY_ID = os.environ.get('BUNNYCDN_LIBRARY_ID')
+else:
+    BUNNYCDN_LIBRARY_ID = ''
+
 
 # Application definition
 
@@ -121,6 +127,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field

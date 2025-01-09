@@ -1,2 +1,36 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block content %}
+{% load static %}
+
+<script type="text/javascript" src="//cdn.embed.ly/player-0.1.0.min.js"></script>
 <h1>Videos index</h1>
-<a href="{% url 'videos_create' %}">Create</a>
+
+<iframe
+  id="bunny-stream-embed"
+  src="https://iframe.mediadelivery.net/embed/{% settings_value "BUNNYCDN_LIBRARY_ID" %}/{{ object.bunny_video_id }}"
+  width="800"
+  height="400"
+  frameborder="0"
+></iframe>
+
+<div class="player-container">
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress"></div>
+    </div>
+    <div class="progress-text">0%</div>
+  </div>
+</div>
+
+<!-- Buttons and pleryer js are not working-->
+<div>
+  <button id="play">Play</button>
+  <button id="pause">Pause</button>
+</div>
+
+{% comment %} https://docs.bunny.net/docs/playback-control-api {% endcomment %}
+{% comment %} https://github.com/embedly/player.js {% endcomment %}
+<script type="text/javascript" src="{% static 'bunny_demo/js/main.js' %}"></script>
+
+{% endblock %}

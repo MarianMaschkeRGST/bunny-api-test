@@ -1,8 +1,9 @@
 from django import forms
+from .models import Video
 
-class VideoUploadForm(forms.Form):
-    title = forms.CharField(max_length=100)
+class VideoUploadForm(forms.ModelForm):
     video_file = forms.FileField()
-    # thumbnail = forms.FileField()
-    # description = forms.CharField(widget=forms.Textarea)
-    # tags = forms.CharField(max_length=100)
+    
+    class Meta:
+        model = Video
+        fields = ['title', 'course']
