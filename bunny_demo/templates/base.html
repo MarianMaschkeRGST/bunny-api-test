@@ -5,6 +5,11 @@
     <meta name="robots" content="noindex" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Bunny Test</title>
+    {% load static %}
+    <script src="{% static 'htmx.min.js' %}"></script>
+    <script src="{% static 'player-0.1.0.min.js' %}"></script>
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    {% comment %} <script type="text/javascript" src="//cdn.embed.ly/player-0.1.0.min.js"></script> {% endcomment %}
   </head>
 
   <body>

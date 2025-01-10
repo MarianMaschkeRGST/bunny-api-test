@@ -1,3 +1,4 @@
+htmx.onLoad(function() {
 // Create a PlayerJS instance with the 'bunny-stream-embed' element
 const player = new playerjs.Player("bunny-stream-embed");
 
@@ -63,4 +64,5 @@ player.on("timeupdate", (timingData) => {
   if ((progressPercentage = 100)) {
     alert("動画終了");
   }
+});
 });

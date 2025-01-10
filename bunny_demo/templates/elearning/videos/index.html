@@ -1,9 +1,7 @@
 {% extends 'base.html' %}
 {% load custom_tags %}
 {% block content %}
-{% load static %}
 
-<script type="text/javascript" src="//cdn.embed.ly/player-0.1.0.min.js"></script>
 <h1>Videos index</h1>
 
 <iframe
@@ -29,8 +27,71 @@
   <button id="pause">Pause</button>
 </div>
 
-{% comment %} https://docs.bunny.net/docs/playback-control-api {% endcomment %}
-{% comment %} https://github.com/embedly/player.js {% endcomment %}
-<script type="text/javascript" src="{% static 'bunny_demo/js/main.js' %}"></script>
+<script>
+  // Initialize player function that can be called by both DOMContentLoaded and HTMX
+  function initializePlayer() {
+    const iframe = document.getElementById("bunny-stream-embed");
+    
+    iframe.onload = () => {
+      // Create a PlayerJS instance
+      const player = new playerjs.Player(iframe);
+  
+      console.log("Player initialized", player);
+  
+      let totalDuration = 0;
+  
+      // Ready event handler
+      player.on("ready", () => {
+        console.log("Player ready");
+
+        player.getDuration((duration) => {
+          totalDuration = duration;
+          console.log(`Video duration: ${duration}s`);
+        });
+      });
+
+      // Play event handler
+      player.on("play", () => {
+        console.log("Video is playing");
+      });
+  
+      // Play button event listener
+      document.getElementById("play").addEventListener("click", () => {
+        player.play();
+      });
+  
+      // Pause button event listener
+      document.getElementById("pause").addEventListener("click", () => {
+        player.pause();
+      });
+  
+      // Timeupdate event handler
+      player.on("timeupdate", (timingData) => {
+        const currentTime = timingData.seconds;
+        const progressPercentage = (currentTime / timingData.duration) * 100;
+  
+        const progressText = document.querySelector(".progress-text");
+        if (progressText) {
+          progressText.textContent = `${Math.floor(progressPercentage)}%`;
+        }
+  
+        const progressBar = document.querySelector(".progress");
+        if (progressBar) {
+          progressBar.style.width = `${Math.floor(progressPercentage)}%`;
+        }
+  
+        if (Math.floor(progressPercentage) >= 100) {
+          alert("Video completed");
+        }
+      });
+    };
+  }
+
+  htmx.onLoad(function(content) {
+    if (content.querySelector("#bunny-stream-embed")) {
+      initializePlayer();
+    }
+  });
+</script>
 
 {% endblock %}

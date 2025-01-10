@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "elearning",
+    "csp",
 ]
 
 MIDDLEWARE = [
@@ -128,10 +129,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    BASE_DIR / "static",
+    os.path.join(BASE_DIR, 'static'),
 ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CSP_DEFAULT_SRC = ("'self'",)  # Default to only loading resources from your own site
+CSP_FRAME_SRC = ("'self'", "https://iframe.mediadelivery.net")  # Allow iframe embedding from BunnyCDN
+CSP_SCRIPT_SRC = ("'self'", "https://iframe.mediadelivery.net")  # If Bunny scripts are needed
