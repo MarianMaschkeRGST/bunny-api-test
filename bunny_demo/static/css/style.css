@@ -1,0 +1,41 @@
+iframe {
+    display: block;
+    margin: 20px 0;
+  }
+  
+  .player-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px; /* Adjust the width as needed */
+    margin: 0;
+  }
+  
+  .progress-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ccc;
+    height: 20px; /* Increase the height of the progress container */
+    display: flex;
+    align-items: center;
+  }
+  
+  .progress-bar {
+    flex: 1;
+    height: 100%;
+    background-color: #00a0e3; /* Adjust the color of the progress bar */
+    transition: width 0.1s linear; /* Add a smooth transition effect */
+  }
+  
+  .progress-text {
+    padding: 5px;
+    font-size: 14px; /* Adjust the font size of the progress text */
+  }
+  
+  .progress {
+    height: 100%; /* or a fixed height */
+    background-color: blue; /* or any color */
+    width: 0%; /* initial width */
+  }
+  

@@ -137,6 +137,6 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSP_DEFAULT_SRC = ("'self'",)  # Default to only loading resources from your own site
-CSP_FRAME_SRC = ("'self'", "https://iframe.mediadelivery.net")  # Allow iframe embedding from BunnyCDN
-CSP_SCRIPT_SRC = ("'self'", "https://iframe.mediadelivery.net")  # If Bunny scripts are needed
+# site headers
+CSP_DEFAULT_SRC = ("'self'",) 
+CSP_FRAME_SRC = ("'self'", "https://iframe.mediadelivery.net") 
