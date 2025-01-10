@@ -105,6 +105,11 @@ class CourseDetailView(LoginRequiredMixin, DetailView):
 class VideoAddView(LoginRequiredMixin, CreateView):
     template_name = "elearning/videos/add.html"
     form_class = VideoUploadForm
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['course_id'] = self.kwargs['pk']
+        return kwargs
     
     def get_success_url(self):
         return reverse_lazy('course_detail', kwargs={'pk': self.object.course.id})

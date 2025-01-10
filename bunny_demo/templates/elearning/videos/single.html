@@ -7,7 +7,7 @@
 <script src="{% static 'js/video.js' %}"></script>
 <link rel="stylesheet" href="{% static 'css/style.css' %}"></link>
 
-<h1>Videos index</h1>
+<h1>{{ object.title }}</h1>
  <iframe
   id="bunny-stream-embed"
   src="https://iframe.mediadelivery.net/embed/{% settings_value "BUNNYCDN_LIBRARY_ID" %}/{{ object.bunny_video_id }}"
@@ -31,6 +31,9 @@
   <button id="play">Play</button>
   <button id="pause">Pause</button>
 </div>
+<p>
+  {{ object.description }}
+</p>
 <script src="{% static 'bunny_demo/css/style.css' %}"></script>
 
 {% endblock %}
