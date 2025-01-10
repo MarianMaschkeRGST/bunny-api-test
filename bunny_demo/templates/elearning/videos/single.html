@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load custom_tags %}
+{% block content %}
+{% load static %}
+<script src="{% static 'htmx.min.js' %}"></script>
+<script src="{% static 'player-0.1.0.min.js' %}"></script>
+<script src="{% static 'js/video.js' %}"></script>
+<link rel="stylesheet" href="{% static 'css/style.css' %}"></link>
+
+<h1>Videos index</h1>
+ <iframe
+  id="bunny-stream-embed"
+  src="https://iframe.mediadelivery.net/embed/{% settings_value "BUNNYCDN_LIBRARY_ID" %}/{{ object.bunny_video_id }}"
+  width="800"
+  height="400"
+  frameborder="0"
+  allow="autoplay"
+  referrerpolicy="origin"
+></iframe>
+
+<div class="player-container">
+  <div class="progress-container">
+    <div class="progress-bar">
+      <div class="progress"></div>
+    </div>
+    <div class="progress-text">0%</div>
+  </div>
+</div>
+
+<div>
+  <button id="play">Play</button>
+  <button id="pause">Pause</button>
+</div>
+<script src="{% static 'bunny_demo/css/style.css' %}"></script>
+
+{% endblock %}

@@ -156,7 +156,7 @@ class VideoAddView(LoginRequiredMixin, CreateView):
 
 class VideoDetailView(LoginRequiredMixin, DetailView):
 
-    template_name = "elearning/videos/index.html"
+    template_name = "elearning/videos/single.html"
     model = Video
 
 def create_and_upload_video(title, collection_id, file_path=None):
