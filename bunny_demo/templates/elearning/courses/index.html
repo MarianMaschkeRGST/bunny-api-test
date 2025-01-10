@@ -1,10 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <div>
   <h1>講座</h1>
-  <div>
-    {% comment %} <a href="{% url 'management:customers_add' %}"><i class="fas fa-plus"></i></a>
-    {%endcomment %}
-  </div>
 
   <section>
     {% if object_list|length == 0 %}
@@ -40,5 +36,8 @@
     </table>
     {% endif %}
   </section>
+  <div style="margin-top: 20px">
+    <a href="{% url 'course_add' %}">コース追加</a>
+  </div>
 </div>
 {% endblock %}

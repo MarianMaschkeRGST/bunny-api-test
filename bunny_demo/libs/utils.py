@@ -41,6 +41,20 @@ class BunnyCDNStream:
 		if status == 404:
 			raise Exception("Not found.")
 
+	def create_collection(self, title):
+		"""
+			Create collection.
+		"""
+		url = self._generate_base_url("/collections")
+		payload = {"name": title}
+	
+		response = requests.post(url, data=json.dumps(payload), headers=self._headers)
+		self._check_status_code(response.status_code)
+		try:
+			return json.loads(response.text)
+		except:
+			raise Exception("Failed to create collection")
+
 	def get_video(self, video_id):
 		"""
 			Get specific video information.

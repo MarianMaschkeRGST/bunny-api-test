@@ -14,7 +14,7 @@ from django.views.generic import CreateView, DetailView, TemplateView, DeleteVie
 from django.views.generic.edit import FormView, UpdateView
 from django.views.decorators.http import require_http_methods
 
-from .forms import VideoUploadForm
+from .forms import CourseForm, VideoUploadForm
 from .filters import CourseFilter
 from .models import Course, Video
 from libs.utils import BunnyCDNStream
@@ -86,7 +86,34 @@ class CourseIndexView(LoginRequiredMixin, FilterView):
         ).order_by('-created_at')
 
 
+class CourseAddView(LoginRequiredMixin, CreateView):
+    template_name = "elearning/courses/add.html"
+    form_class = CourseForm
+    
+    def get_success_url(self):
+        return reverse_lazy('course_detail', kwargs={'pk': self.object.pk})
 
+    def form_valid(self, form):
+        
+        try:
+            bunny_response = create_collection(title=form.cleaned_data['name'])
+            
+            print("Full BunnyCDN response:", bunny_response) 
+            
+            if 'guid' not in bunny_response:
+                raise Exception(f"Missing video ID in BunnyCDN response: {bunny_response}")
+
+            # Save course with bunny_course_id
+            course = form.save(commit=False)
+            course.bunny_collection_id = bunny_response['guid']
+            course.save()
+
+            messages.success(self.request, "Collection created successfully")
+            return super().form_valid(form)
+
+        except Exception as e:
+            messages.error(self.request, f"Collection creation failed: {str(e)}")
+            return self.form_invalid(form)
     
 
 class CourseDetailView(LoginRequiredMixin, DetailView):
@@ -163,6 +190,31 @@ class VideoDetailView(LoginRequiredMixin, DetailView):
 
     template_name = "elearning/videos/single.html"
     model = Video
+
+
+# https://docs.bunny.net/reference/collection_createcollection
+def create_collection(title):
+    """
+    Creates a Collection in Bunny.
+    """
+    try:
+        # Initialize BunnyCDN client
+        stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
+        api_key = os.getenv('BUNNYCDN_API_KEY', '')
+
+        client = BunnyCDNStream(stream_library_id, api_key)
+
+        response = client.create_collection(title)
+        print("BunnyCDN create_collection response:", response)
+
+        return response
+        
+    except Exception as e:
+        print(f"BunnyCDN Error: {str(e)}")  # Debug print
+        if hasattr(e, 'response'):
+            print(f"Response Status: {e.response.status_code}")
+            print(f"Response Body: {e.response.text}")
+        raise Exception(f"Failed to create collection: {str(e)}")
 
 def create_and_upload_video(title, collection_id, file_path=None):
     """

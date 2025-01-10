@@ -34,6 +34,7 @@
 <p>
   {{ object.description }}
 </p>
-<script src="{% static 'bunny_demo/css/style.css' %}"></script>
-
+<div style="margin-top: 20px;">
+  <a href="{% url 'course_detail' object.course.pk %}">コースに戻る</a>
+</div>
 {% endblock %}
