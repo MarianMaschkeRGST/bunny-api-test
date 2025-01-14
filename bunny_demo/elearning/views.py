@@ -1,3 +1,4 @@
+import json
 import sys
 import ffmpeg
 import os
@@ -8,15 +9,15 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Sum
 from django_filters.views import FilterView
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
-from django.views.generic import CreateView, DetailView, TemplateView, DeleteView
+from django.views.generic import CreateView, DetailView, TemplateView, DeleteView, View
 from django.views.generic.edit import FormView, UpdateView
 from django.views.decorators.http import require_http_methods
 
 from .forms import CourseForm, VideoUploadForm
 from .filters import CourseFilter
-from .models import Course, Video
+from .models import Course, Video, VideoProgress
 from libs.utils import BunnyCDNStream
 
 from django.contrib import messages
@@ -190,6 +191,52 @@ class VideoDetailView(LoginRequiredMixin, DetailView):
 
     template_name = "elearning/videos/single.html"
     model = Video
+    pk_url_kwarg = 'video_pk' 
+
+    def get_queryset(self):
+        # This ensures we get videos for the correct course
+        return Video.objects.filter(
+            course_id=self.kwargs['pk']
+        ).select_related('course')
+
+
+class VideoProgressUpdateView(LoginRequiredMixin, View):
+    def post(self, request, pk, video_pk):
+        try:
+            video = Video.objects.get(course_id=pk, pk=video_pk)
+            watch_progress = int(request.POST.get('watch_progress', 0))
+
+            print(f"Received progress update: {watch_progress}%")  # Debug print
+            
+            # Validate progress is between 0 and 100
+            watch_progress = max(0, min(100, watch_progress))
+            
+            # Get or create progress record for this user and video
+            video_progress, created = VideoProgress.objects.get_or_create(
+                user=request.user,
+                video=video,
+                defaults={'watch_progress': watch_progress}
+            )
+            
+            # Update progress if it's higher than existing
+            if not created:
+                video_progress.watch_progress = watch_progress
+                video_progress.save(update_fields=['watch_progress', 'updated_at'])
+            
+            print(f"Saved progress: {video_progress.watch_progress}%")  # Debug print
+                
+            return JsonResponse({
+                'success': True,
+                'progress': watch_progress,
+                'message': f'Progress updated to {watch_progress}%'
+            })
+            
+        except Exception as e:
+            print(f"Error saving progress: {str(e)}")  # Debug print
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=500)
 
 
 # https://docs.bunny.net/reference/collection_createcollection

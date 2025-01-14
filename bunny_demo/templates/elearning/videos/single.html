@@ -31,6 +31,26 @@
   <button id="play">Play</button>
   <button id="pause">Pause</button>
 </div>
+<form     
+  hx-post="{% url 'video_progress_update' object.course.pk object.pk %}"
+  hx-trigger="submit"
+  hx-swap="none"
+  hx-indicator="#progress-indicator"
+  id="progress-form"
+>
+  {% csrf_token %}
+  <input type="hidden" id="progress-input" name="watch_progress" value="0">
+  <button 
+    type="submit"
+    id="save-progress"
+  >
+    Save Progress
+  </button>
+  <span id="progress-indicator" class="htmx-indicator">Saving...</span>
+</form>
+<div>
+  Watch Progress: {{ object|call_with_user:request.user }}%
+</div>
 <p>
   {{ object.description }}
 </p>

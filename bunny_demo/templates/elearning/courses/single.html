@@ -1,9 +1,6 @@
 {% extends 'base.html' %} {% block content %}
 <div>
   <h1>講座詳細</h1>
-
-
-
   <section id="customer-detail">
     <table>
       <tbody>
@@ -36,6 +33,7 @@
         <th>ID</th>
         <th>動画名</th>
         <th>時間（分）</th>
+        <th>進捗</th>
         <th>作成日</th>
         <th>更新日</th>
       </thead>
@@ -48,6 +46,7 @@
             <a href="{% url 'video_detail' course.pk video.pk %}"> {{ video.title }} </a>
           </td>
           <td>{{ video.duration }}</td>
+          <td>{{ video.watch_progress }}%</td>
           <td>{{ video.created_at }}</td>
           <td>{{ video.updated_at }}</td>
         </tr>
@@ -56,10 +55,10 @@
     </table>
     {% endif %}
   </section>
-  <div style="margin-top: 20px;">
+  <div style="margin-top: 20px">
     <a href="{% url 'video_add' course.pk %}">動画追加</a>
   </div>
-  <div style="margin-top: 20px;">
+  <div style="margin-top: 20px">
     <a href="{% url 'course_index' %}">コース一覧へ戻る</a>
   </div>
 </div>
