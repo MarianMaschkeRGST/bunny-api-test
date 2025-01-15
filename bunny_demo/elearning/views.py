@@ -256,8 +256,24 @@ class VideoUpdateView(LoginRequiredMixin, UpdateView):
         return super().post(request, *args, **kwargs)
     
     def form_valid(self, form):
-        messages.success(self.request, '動画情報を更新しました。')
-        return super().form_valid(form)
+        # messages.success(self.request, '動画情報を更新しました。')
+        # return super().form_valid(form)
+        try:
+            if form.cleaned_data['title'] != self.get_object().title:
+                stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
+                api_key = os.getenv('BUNNYCDN_API_KEY', '')
+                client = BunnyCDNStream(stream_library_id, api_key)
+                
+                video = self.get_object()
+                
+                client.update_video(video_id=video.bunny_video_id ,title=form.cleaned_data['title'],collection_id=video.course.bunny_collection_id)
+            
+            messages.success(self.request, '動画情報を更新しました。')
+            return super().form_valid(form)
+                
+        except Exception as e:
+            messages.error(self.request, f'BunnyCDN更新エラー: {str(e)}')
+            return self.form_invalid(form)
     
     def form_invalid(self, form):
         messages.error(self.request, '入力内容に誤りがあります。')
