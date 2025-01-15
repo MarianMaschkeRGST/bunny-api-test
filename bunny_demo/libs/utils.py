@@ -68,7 +68,20 @@ class BunnyCDNStream:
 			return json.loads(response.text)
 		except:
 			raise Exception("Failed to update collection")
+		
+	def delete_collection(self, collection_id):
+		"""
+			Delete a collection by ID.
+		"""
+		url = self._generate_base_url("/collections/" + collection_id)
 
+		response = requests.delete(url, headers=self._headers)
+		self._check_status_code(response.status_code)
+		try:
+			return json.loads(response.text)
+		except:
+			raise Exception("Failed to delete collection")
+		
 	def get_video(self, video_id):
 		"""
 			Get specific video information.

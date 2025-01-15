@@ -22,7 +22,10 @@
         </tr>
         <tr>
           <th></th>
-          <td><a href="{% url 'course_update' object.pk %}">コース情報編集</a></td>
+          <td>
+            <a href="{% url 'course_update' object.pk %}">コース情報編集</a>
+            <a href="{% url 'course_delete' object.pk %}">コース削除</a>
+          </td>
         </tr>
       </tbody>
     </table>

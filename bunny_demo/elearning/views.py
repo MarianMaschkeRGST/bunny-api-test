@@ -129,6 +129,33 @@ class CourseUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_invalid(form)
     
 
+class CourseDeleteView(LoginRequiredMixin, DeleteView):
+    model = Course
+    template_name = 'elearning/courses/delete.html'
+    
+    def get_success_url(self):
+        return reverse('course_index')
+    
+    def post(self, request, *args, **kwargs):
+        course = self.get_object()
+        try:
+            # Initialize BunnyCDN client
+            stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
+            api_key = os.getenv('BUNNYCDN_API_KEY', '')
+            client = BunnyCDNStream(stream_library_id, api_key)
+            
+            # Delete bunny collection before model
+            client.delete_collection(course.bunny_collection_id)
+            
+            # Delete model
+            messages.success(request, f'コース "{course.name}" を削除しました。')
+            return super().post(request, *args, **kwargs)
+            
+        except Exception as e:
+            messages.error(request, f'コースの削除に失敗しました: {str(e)}')
+            return redirect('course_detail', pk=course.id)
+
+
 class VideoAddView(LoginRequiredMixin, CreateView):
     template_name = "elearning/videos/add.html"
     form_class = VideoUploadForm

@@ -28,7 +28,10 @@
             <td>{{ course.video_count }}</td>
             <td>{{ course.get_total_duration| seconds_to_time_str }}</td>
             <td>{{ course|call_get_course_progress:request.user }}%</td>
-            <td><a href="{% url 'course_update' course.pk %}">コース情報編集</a></td>
+            <td>
+              <a href="{% url 'course_update' course.pk %}">情報編集</a>
+              <a href="{% url 'course_delete' course.pk %}">削除</a>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
