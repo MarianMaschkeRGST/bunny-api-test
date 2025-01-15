@@ -22,6 +22,19 @@ class Course(models.Model):
         auto_now=True,
     )
 
+    def get_total_duration(self):
+        """Aggregate course video duration"""
+        videos = self.video_set.all()
+        if not videos:
+            return 0
+        
+        total_duration = 0
+        for video in videos:
+            duration = video.duration
+            total_duration += duration
+        
+        return total_duration
+
     def get_course_progress_for_user(self, user):
         """Calculate how much of the course the current user has completed"""
         videos = self.video_set.all()

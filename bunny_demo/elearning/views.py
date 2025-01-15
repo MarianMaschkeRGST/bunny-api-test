@@ -10,12 +10,12 @@ from django.core.files.storage import FileSystemStorage
 from django.db.models import Count, Sum
 from django_filters.views import FilterView
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DetailView, TemplateView, DeleteView, View
 from django.views.generic.edit import FormView, UpdateView
 from django.views.decorators.http import require_http_methods
 
-from .forms import CourseForm, VideoUploadForm
+from .forms import CourseForm, VideoUploadForm, VideoUpdateForm
 from .filters import CourseFilter
 from .models import Course, Video, VideoProgress
 from libs.utils import BunnyCDNStream
@@ -36,39 +36,6 @@ for var in required_env_vars:
     if not os.getenv(var):
         raise Exception(f'{var} environment variable is not set.')
 
-# Views
-# def index(request):
-#     return render(request, 'videos/index.html')
-
-
-# class VideoListview(LoginRequiredMixin, TemplateView):
-#     template_name = "videos/index"
-
-#     def get_context_data(self, **kwargs) -> dict[str, Any]:
-#         context = super().get_context_data(**kwargs)
-
-#         try:
-#             # Get Video collection from bunny
-#             # Initialize BunnyCDN client
-#             stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
-#             api_key = os.getenv('BUNNYCDN_API_KEY', '')
-            
-#             client = BunnyCDNStream(stream_library_id, api_key)
-
-#             # Create video entry
-#             response = client.list_videos(collection_id="bda9f79b-419d-46ff-b19b-c3808870befc")
-
-#             videos = []
-
-#             context.update(response)
-                            
-#         except Exception as e:
-#             print(f"Error fetching PayPal invoices: {str(e)}")
-#             if hasattr(e, 'response'):
-#                 print(f"Response Status: {e.response.status_code}")
-#                 print(f"Response Body: {e.response.text}")
-                
-#             return context
 
 class CourseIndexView(LoginRequiredMixin, FilterView):
     
@@ -141,12 +108,6 @@ class VideoAddView(LoginRequiredMixin, CreateView):
     
     def get_success_url(self):
         return reverse_lazy('course_detail', kwargs={'pk': self.object.course.id})
-    
-    # def get_context_data(self, **kwargs):
-    #     context = super().get_context_data(**kwargs)
-    #     # Add course selection to the template context
-    #     context['courses'] = Course.objects.all().order_by('-created_at')
-    #     return context
 
     def form_valid(self, form):
         video_file = self.request.FILES['video_file']
@@ -186,9 +147,64 @@ class VideoAddView(LoginRequiredMixin, CreateView):
             cleanup_files(fs, filename)
 
 
+class VideoUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = "elearning/videos/update.html"
+    model = Video
+    form_class = VideoUpdateForm
+    pk_url_kwarg = 'video_pk'
+
+    def get_success_url(self):
+        return reverse('video_detail', kwargs={
+            'pk': self.object.course.pk,
+            'video_pk': self.object.pk
+        })
+    
+    def get_object(self, queryset=None):
+        # Get both course_id and video_id from the URL
+        course_id = self.kwargs.get('pk')
+        video_id = self.kwargs.get('video_pk')
+
+        return get_object_or_404(Video, course_id=course_id, id=video_id)
+    
+    def post(self, request, *args, **kwargs):
+        if 'sync_duration' in request.POST:
+            # Handle duration sync
+            video = self.get_object()
+            try:
+                # Initialize BunnyCDN client
+                stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
+                api_key = os.getenv('BUNNYCDN_API_KEY', '')
+                client = BunnyCDNStream(stream_library_id, api_key)
+                
+                # Get video details from BunnyCDN
+                video_details = client.get_video(video.bunny_video_id)
+                print(video_details)
+                
+                duration_seconds = video_details.get('length', 0)
+                if duration_seconds > 0:
+                    video.duration = duration_seconds
+                    video.save(update_fields=['duration'])
+                    messages.success(request, f'Duration updated to {video.duration} ')
+                else:
+                    messages.warning(request, 'Video is still processing, please try again later')
+                
+            except Exception as e:
+                messages.error(request, f'Failed to sync duration: {str(e)}')
+            
+            return redirect(request.path)
+        
+        # Handle regular form submission
+        return super().post(request, *args, **kwargs)
+    
+    def form_valid(self, form):
+        messages.success(self.request, '動画情報を更新しました。')
+        return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, '入力内容に誤りがあります。')
+        return super().form_invalid(form)
 
 class VideoDetailView(LoginRequiredMixin, DetailView):
-
     template_name = "elearning/videos/single.html"
     model = Video
     pk_url_kwarg = 'video_pk' 

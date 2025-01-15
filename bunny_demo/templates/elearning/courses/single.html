@@ -13,6 +13,10 @@
           <td>{{ object.name }}</td>
         </tr>
         <tr>
+          <th>コース時間</th>
+          <td>{{ object.get_total_duration | seconds_to_time_str }}</td>
+        </tr>
+        <tr>
           <th>コース進捗</th>
           <td>{{ object|call_get_course_progress:request.user }}%</td>
         </tr>
@@ -29,7 +33,8 @@
         <th>ID</th>
         <th>動画名</th>
         <th>時間（分）</th>
-        <th>進捗</th>
+        <th>動画進捗</th>
+        <th>メニュー</th>
       </thead>
 
       <tbody>
@@ -39,8 +44,11 @@
           <td>
             <a href="{% url 'video_detail' course.pk video.pk %}"> {{ video.title }} </a>
           </td>
-          <td>{{ video.duration }}</td>
+          <td>{{ video.duration | seconds_to_time_str }}</td>
           <td>{{ video | call_get_progress_for_user:request.user }}%</td>
+          <td>
+            <a href="{% url 'video_update' course.pk video.pk %}">動画情報変更</a>
+          </td>
         </tr>
         {% endfor%}
       </tbody>

@@ -22,3 +22,11 @@ class VideoUploadForm(forms.ModelForm):
     class Meta:
         model = Video
         fields = ['title', 'course', 'duration', 'description']
+
+class VideoUpdateForm(forms.ModelForm):
+    """Form for adding and editing videos to course."""
+    duration = forms.IntegerField(disabled=True, required=False)
+
+    class Meta:
+        model = Video
+        fields = ['title', 'course', 'duration', 'description']

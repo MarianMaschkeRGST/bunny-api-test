@@ -1,3 +1,4 @@
+import datetime
 from django import template
 from django.conf import settings
 
@@ -19,3 +20,8 @@ def call_get_progress_for_user(obj, user):
 def call_get_course_progress(obj, user):
     """Get course progress for a user"""
     return obj.get_course_progress_for_user(user)
+
+@register.filter
+def seconds_to_time_str(obj):
+    """Transform seconds duration to time string"""
+    return str(datetime.timedelta(seconds=obj))

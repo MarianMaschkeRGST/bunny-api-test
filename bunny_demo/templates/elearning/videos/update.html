@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% load custom_tags %} {% block content %}
+<div class="container-fluid">
+<h1>動画情報編集</h1>
+
+<form method="post" enctype="multipart/form-data">
+    <section class="video-update">
+        {% csrf_token %}
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <table class="table table-bordered">
+                    <tbody>
+                      <tr>
+                        <th class="table-secondary">動画タイトル</th>
+                        <td>{{ form.title }}</td>
+                      </tr>
+                      <tr>
+                        <th class="table-secondary">講座</th>
+                        <td>{{ form.course }}</td>
+                      </tr>
+                      <tr>
+                        <th class="table-secondary">時間</th>
+                        <td><span>{{ object.duration|seconds_to_time_str }}</span><button type="submit" name="sync_duration">Sync Duration</button></td>
+                      </tr>
+                      <tr>
+                        <th class="table-secondary">備考</th>
+                        <td>{{ form.description }}</td>
+                      </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>  
+    <button type="submit">Update</button>
+</form>
+
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endblock %}
