@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} {% load custom_tags %} {% block content %}
 <div>
   <h1>講座詳細</h1>
   <section id="customer-detail">
@@ -34,8 +34,6 @@
         <th>動画名</th>
         <th>時間（分）</th>
         <th>進捗</th>
-        <th>作成日</th>
-        <th>更新日</th>
       </thead>
 
       <tbody>
@@ -46,9 +44,7 @@
             <a href="{% url 'video_detail' course.pk video.pk %}"> {{ video.title }} </a>
           </td>
           <td>{{ video.duration }}</td>
-          <td>{{ video.watch_progress }}%</td>
-          <td>{{ video.created_at }}</td>
-          <td>{{ video.updated_at }}</td>
+          <td>{{ video | call_with_user:request.user }}%</td>
         </tr>
         {% endfor%}
       </tbody>

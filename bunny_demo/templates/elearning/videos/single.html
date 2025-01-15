@@ -30,6 +30,8 @@
 <div>
   <button id="play">Play</button>
   <button id="pause">Pause</button>
+  <button id="return">10s back</button>
+  <button id="reset">Reset</button>
 </div>
 <form     
   hx-post="{% url 'video_progress_update' object.course.pk object.pk %}"
@@ -39,12 +41,12 @@
   id="progress-form"
 >
   {% csrf_token %}
-  <input type="hidden" id="progress-input" name="watch_progress" value="0">
+  <input type="hidden" id="progress-input" name="watch_progress" value="{{ object|call_with_user:request.user }}">
   <button 
     type="submit"
     id="save-progress"
   >
-    Save Progress
+    Save progress
   </button>
   <span id="progress-indicator" class="htmx-indicator">Saving...</span>
 </form>

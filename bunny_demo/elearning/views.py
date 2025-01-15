@@ -21,7 +21,7 @@ from .models import Course, Video, VideoProgress
 from libs.utils import BunnyCDNStream
 
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
 # Load environment variables from .env file
 load_dotenv()
@@ -194,7 +194,6 @@ class VideoDetailView(LoginRequiredMixin, DetailView):
     pk_url_kwarg = 'video_pk' 
 
     def get_queryset(self):
-        # This ensures we get videos for the correct course
         return Video.objects.filter(
             course_id=self.kwargs['pk']
         ).select_related('course')
@@ -218,21 +217,30 @@ class VideoProgressUpdateView(LoginRequiredMixin, View):
                 defaults={'watch_progress': watch_progress}
             )
             
-            # Update progress if it's higher than existing
-            if not created:
+            # Update progress if higher than existing 
+            if not created and watch_progress > video_progress.watch_progress:
                 video_progress.watch_progress = watch_progress
                 video_progress.save(update_fields=['watch_progress', 'updated_at'])
             
             print(f"Saved progress: {video_progress.watch_progress}%")  # Debug print
+            
+            # Include redirect URL in JSON response
+            success_url = reverse('course_detail', kwargs={'pk': video.course_id})
                 
-            return JsonResponse({
+                
+            response = JsonResponse({
                 'success': True,
                 'progress': watch_progress,
-                'message': f'Progress updated to {watch_progress}%'
+                'message': f'Progress updated to {watch_progress}%',
+                'redirect_url': success_url
             })
+
+            # Redirect on success - weird UX
+            # response['HX-Redirect'] = reverse('course_detail', kwargs={'pk': pk})
+            return response
             
         except Exception as e:
-            print(f"Error saving progress: {str(e)}")  # Debug print
+            print(f"Error saving progress: {str(e)}") 
             return JsonResponse({
                 'success': False,
                 'error': str(e)

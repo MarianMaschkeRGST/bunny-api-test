@@ -1,5 +1,5 @@
+// https://github.com/embedly/player.js#playerjs
 //Manage video progress for submission and initial settings
-
 let currentProgress = 0;
 
 function getCurrentProgress() {
@@ -9,6 +9,7 @@ function getCurrentProgress() {
 
 function initializePlayer() {
   const iframe = document.getElementById("bunny-stream-embed");
+  const progressInput = document.getElementById("progress-input");
 
   iframe.onload = () => {
     const player = new playerjs.Player(iframe, {
@@ -20,16 +21,21 @@ function initializePlayer() {
     });
 
     player.on("ready", () => {
-      console.log("Player ready");
-      // Duration logic is not working
-      // player.getDuration((duration) => {
-      //   totalDuration = duration;
-      //   console.log(`Video duration: ${duration}s`);
-      // });
+      // Timeout is dirty solution - on ready fires too early
+      player.pause();
+      setTimeout(() => {
+        player.getDuration((value) => {
+          player.pause();
+          const progressInput = document.getElementById("progress-input");
+          const realProgress = value * (progressInput.value / 100);
+          player.setCurrentTime(realProgress);
+        });
+      }, 1000);
     });
 
     player.on("play", () => {
       console.log("Video is playing");
+      player.getDuration((value) => console.log("getDuration2:", value));
     });
 
     document.getElementById("play").addEventListener("click", () => {
@@ -38,7 +44,14 @@ function initializePlayer() {
 
     document.getElementById("pause").addEventListener("click", () => {
       player.pause();
-      console.log(currentProgress);
+    });
+    document.getElementById("return").addEventListener("click", () => {
+      player.getCurrentTime((value) => {
+        player.setCurrentTime(value - 10);
+      });
+    });
+    document.getElementById("reset").addEventListener("click", () => {
+      player.setCurrentTime(0);
     });
 
     player.on("timeupdate", (timingData) => {
@@ -57,14 +70,16 @@ function initializePlayer() {
           progressBar.style.width = `${Math.floor(progressPercentage)}%`;
         }
 
-        // Update progress input value
-        const progressInput = document.getElementById("progress-input");
         if (progressInput) {
           progressInput.value = Math.floor(currentProgress);
         }
 
         if (Math.floor(progressPercentage) >= 100) {
-          alert("Video completed");
+          console.log("Video completed");
+          const progressForm = document.getElementById("progress-form");
+          if (progressForm) {
+            progressForm.dispatchEvent(new Event("submit"));
+          }
         }
       }
     });
