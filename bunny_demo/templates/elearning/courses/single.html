@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% load custom_tags %} {% block content %}
 <div>
-  <h1>講座詳細</h1>
+  <h1>コース詳細</h1>
   <section id="customer-detail">
     <table>
       <tbody>
@@ -9,7 +9,7 @@
           <td>{{ object.bunny_collection_id }}</td>
         </tr>
         <tr>
-          <th>講座名</th>
+          <th>コース名</th>
           <td>{{ object.name }}</td>
         </tr>
         <tr>
@@ -23,15 +23,15 @@
         <tr>
           <th></th>
           <td>
-            <a href="{% url 'course_update' object.pk %}">コース情報編集</a>
-            <a href="{% url 'course_delete' object.pk %}">コース削除</a>
+            <a href="{% url 'course_update' object.pk %}">編集</a>
+            <a href="{% url 'course_delete' object.pk %}">削除</a>
           </td>
         </tr>
       </tbody>
     </table>
   </section>
   <section id="video-list">
-    <h2>講座動画一覧</h2>
+    <h2>コース動画一覧</h2>
     {% if videos|length == 0 %}
     <p>No Videos found</p>
     {% else %}
@@ -39,7 +39,7 @@
       <thead>
         <th>ID</th>
         <th>動画名</th>
-        <th>時間（分）</th>
+        <th>時間</th>
         <th>動画進捗</th>
         <th>メニュー</th>
       </thead>
@@ -54,8 +54,8 @@
           <td>{{ video.duration | seconds_to_time_str }}</td>
           <td>{{ video | call_get_progress_for_user:request.user }}%</td>
           <td>
-            <a href="{% url 'video_update' course.pk video.pk %}">動画情報変更</a>
-            <a href="{% url 'video_delete' course.pk video.pk %}">動画削除</a>
+            <a href="{% url 'video_update' course.pk video.pk %}">編集</a>
+            <a href="{% url 'video_delete' course.pk video.pk %}">削除</a>
           </td>
         </tr>
         {% endfor%}

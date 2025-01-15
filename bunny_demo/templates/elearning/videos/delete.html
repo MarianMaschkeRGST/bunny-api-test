@@ -1,14 +1,17 @@
 {% extends "base.html" %} {% block content %}
 <div>
-  <h2>Delete Confirmation</h2>
+  <h2>{{object.title}}の削除</h2>
 
-  <p>Are you sure you want to delete "{{ object.title }}"?</p>
+  <p>
+    {{object.title}}を削除しますか？<br />
+    この操作は取り消せません。
+  </p>
 
   <form method="post">
     {% csrf_token %}
     <div>
-      <a href="{% url 'course_detail' pk=object.course.pk %}">Cancel</a>
-      <button type="submit">Delete</button>
+      <a href="{% url 'course_detail' pk=object.course.pk %}">戻る</a>
+      <button type="submit">削除</button>
     </div>
   </form>
 </div>

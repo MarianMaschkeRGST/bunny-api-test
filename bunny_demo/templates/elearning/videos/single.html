@@ -30,8 +30,8 @@
 <div>
   <button id="play">Play</button>
   <button id="pause">Pause</button>
-  <button id="return">10s back</button>
-  <button id="reset">Reset</button>
+  <button id="return">10秒　戻る</button>
+  <button id="reset">リセット</button>
 </div>
 <form     
   hx-post="{% url 'video_progress_update' object.course.pk object.pk %}"
@@ -46,12 +46,12 @@
     type="submit"
     id="save-progress"
   >
-    Save progress
+    進捗保存
   </button>
   <span id="progress-indicator" class="htmx-indicator">Saving...</span>
 </form>
 <div>
-  Watch Progress: {{ object|call_get_progress_for_user:request.user }}%
+  進捗: {{ object|call_get_progress_for_user:request.user }}%
 </div>
 <p>
   {{ object.description }}

@@ -1,6 +1,6 @@
 {% extends 'base.html' %} {% load custom_tags %}{% block content %}
 <div>
-  <h1>講座</h1>
+  <h1>コース一覧</h1>
 
   <section>
     {% if object_list|length == 0 %}
@@ -9,9 +9,8 @@
     <table>
       <tr>
         <thead>
-          <th>PK</th>
-          <th>講座名</th>
           <th>Collection ID</th>
+          <th>コース名</th>
           <th>動画数</th>
           <th>コース時間</th>
           <th>コース進捗</th>
@@ -20,16 +19,15 @@
         <tbody>
           {% for course in object_list %}
           <tr>
-            <td>{{ course.pk }}</td>
+            <td>{{ course.bunny_collection_id }}</td>
             <td>
               <a href="{% url 'course_detail' course.pk %}"> {{ course.name }} </a>
             </td>
-            <td>{{ course.bunny_collection_id }}</td>
             <td>{{ course.video_count }}</td>
             <td>{{ course.get_total_duration| seconds_to_time_str }}</td>
             <td>{{ course|call_get_course_progress:request.user }}%</td>
             <td>
-              <a href="{% url 'course_update' course.pk %}">情報編集</a>
+              <a href="{% url 'course_update' course.pk %}">編集</a>
               <a href="{% url 'course_delete' course.pk %}">削除</a>
             </td>
           </tr>

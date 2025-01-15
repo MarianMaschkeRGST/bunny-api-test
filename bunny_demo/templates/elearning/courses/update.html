@@ -1,33 +1,25 @@
 {% extends 'base.html' %} {% load custom_tags %} {% block content %}
 <div class="container-fluid">
-<h1>コース情報編集</h1>
+  <h1>コース情報編集</h1>
 
-<form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data">
     <section class="course-update">
-        {% csrf_token %}
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <table class="table table-bordered">
-                    <tbody>
-                      <tr>
-                        <th class="table-secondary">コースタイトル</th>
-                        <td>{{ form.name }}</td>
-                      </tr>
-                    </tbody>
-                </table>
-            </div>
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-8 offset-md-2">
+          <table class="table table-bordered">
+            <tbody>
+              <tr>
+                <th class="table-secondary">コースタイトル</th>
+                <td>{{ form.name }}</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-    </section>  
-    <button type="submit">更新する</button>
-    {% comment %} <a href="{% url 'video_delete' object.course.pk object.pk %}">動画削除</a> {% endcomment %}
-</form>
-
-    {% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-    {% endif %}
+      </div>
+    </section>
+    <button type="submit">更新</button>
+    <a href="{% url 'course_delete' object.pk %}">削除</a>
+  </form>
 </div>
 {% endblock %}
