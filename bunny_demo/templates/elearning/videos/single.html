@@ -41,7 +41,7 @@
   id="progress-form"
 >
   {% csrf_token %}
-  <input type="hidden" id="progress-input" name="watch_progress" value="{{ object|call_with_user:request.user }}">
+  <input type="hidden" id="progress-input" name="watch_progress" value="{{ object|call_get_progress_for_user:request.user }}">
   <button 
     type="submit"
     id="save-progress"
@@ -51,7 +51,7 @@
   <span id="progress-indicator" class="htmx-indicator">Saving...</span>
 </form>
 <div>
-  Watch Progress: {{ object|call_with_user:request.user }}%
+  Watch Progress: {{ object|call_get_progress_for_user:request.user }}%
 </div>
 <p>
   {{ object.description }}

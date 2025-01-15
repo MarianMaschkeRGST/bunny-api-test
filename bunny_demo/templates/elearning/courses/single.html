@@ -13,12 +13,8 @@
           <td>{{ object.name }}</td>
         </tr>
         <tr>
-          <th>作成日</th>
-          <td>{{ object.created_at }}</td>
-        </tr>
-        <tr>
-          <th>更新日</th>
-          <td>{{ object.updated_at }}</td>
+          <th>コース進捗</th>
+          <td>{{ object|call_get_course_progress:request.user }}%</td>
         </tr>
       </tbody>
     </table>
@@ -44,7 +40,7 @@
             <a href="{% url 'video_detail' course.pk video.pk %}"> {{ video.title }} </a>
           </td>
           <td>{{ video.duration }}</td>
-          <td>{{ video | call_with_user:request.user }}%</td>
+          <td>{{ video | call_get_progress_for_user:request.user }}%</td>
         </tr>
         {% endfor%}
       </tbody>

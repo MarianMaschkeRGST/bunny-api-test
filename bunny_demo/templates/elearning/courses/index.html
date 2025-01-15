@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'base.html' %} {% load custom_tags %}{% block content %}
 <div>
   <h1>講座</h1>
 
@@ -14,8 +14,7 @@
           <th>Collection ID</th>
           <th>動画数</th>
           <th>コース時間（分）</th>
-          <th>登録日</th>
-          <th>更新日</th>
+          <th>動画進捗</th>
         </thead>
         <tbody>
           {% for course in object_list %}
@@ -27,8 +26,7 @@
             <td>{{ course.bunny_collection_id }}</td>
             <td>{{ course.video_count }}</td>
             <td>{{ course.total_duration }}</td>
-            <td>{{ course.created_at }}</td>
-            <td>{{ course.updated_at }}</td>
+            <td>{{ course|call_get_course_progress:request.user }}%</td>
           </tr>
           {% endfor %}
         </tbody>

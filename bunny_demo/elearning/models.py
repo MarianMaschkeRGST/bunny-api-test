@@ -22,6 +22,21 @@ class Course(models.Model):
         auto_now=True,
     )
 
+    def get_course_progress_for_user(self, user):
+        """Calculate how much of the course the current user has completed"""
+        videos = self.video_set.all()
+        if not videos:
+            return 0
+            
+        total_progress = 0
+        for video in videos:
+            try:
+                progress = video.videoprogress_set.get(user=user)
+                total_progress += progress.watch_progress
+            except VideoProgress.DoesNotExist:
+                continue
+        return round(total_progress / videos.count())
+    
     def __str__(self):
         return self.name
     
@@ -59,6 +74,7 @@ class Video(models.Model):
     )
 
     def get_progress_for_user(self, user):
+        """Show video progress for user"""
         try:
             progress = self.videoprogress_set.get(user=user)
             return progress.watch_progress
