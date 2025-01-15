@@ -20,6 +20,10 @@
           <th>コース進捗</th>
           <td>{{ object|call_get_course_progress:request.user }}%</td>
         </tr>
+        <tr>
+          <th></th>
+          <td><a href="{% url 'course_update' object.pk %}">コース情報編集</a></td>
+        </tr>
       </tbody>
     </table>
   </section>

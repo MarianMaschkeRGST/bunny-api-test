@@ -1,9 +1,7 @@
-import json
 import sys
-import ffmpeg
 import os
+
 from dotenv import load_dotenv
-from typing import Any, Dict
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import FileSystemStorage
@@ -12,7 +10,7 @@ from django_filters.views import FilterView
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import CreateView, DetailView, DeleteView, View
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import UpdateView
 from django.views.decorators.http import require_http_methods
 
 from .forms import CourseForm, VideoUploadForm, VideoUpdateForm
@@ -85,7 +83,6 @@ class CourseAddView(LoginRequiredMixin, CreateView):
     
 
 class CourseDetailView(LoginRequiredMixin, DetailView):
-
     template_name = "elearning/courses/single.html"
     model = Course
 
@@ -96,6 +93,41 @@ class CourseDetailView(LoginRequiredMixin, DetailView):
         context['videos'] = Video.objects.filter(course=context['course']).order_by('-created_at')
         return context
 
+class CourseUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = "elearning/courses/update.html"
+    model = Course
+    form_class = CourseForm
+
+    def get_success_url(self):
+        return reverse('course_detail', kwargs={
+            'pk': self.object.pk,
+        })
+    
+    def form_valid(self, form):
+        try:
+            if form.cleaned_data['name'] != self.get_object().name:
+                stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
+                api_key = os.getenv('BUNNYCDN_API_KEY', '')
+                client = BunnyCDNStream(stream_library_id, api_key)
+                
+                course = self.get_object()
+                
+                client.update_collection(
+                    collection_id=course.bunny_collection_id,
+                    title=form.cleaned_data['name']
+                )
+            
+            messages.success(self.request, 'コース情報を更新しました。')
+            return super().form_valid(form)
+                
+        except Exception as e:
+            messages.error(self.request, f'BunnyCDN更新エラー: {str(e)}')
+            return self.form_invalid(form)
+    
+    def form_invalid(self, form):
+        messages.error(self.request, '入力内容に誤りがあります。')
+        return super().form_invalid(form)
+    
 
 class VideoAddView(LoginRequiredMixin, CreateView):
     template_name = "elearning/videos/add.html"

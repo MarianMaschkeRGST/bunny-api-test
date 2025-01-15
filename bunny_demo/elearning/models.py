@@ -69,7 +69,7 @@ class Video(models.Model):
         max_length=256,
     )
     duration = models.IntegerField(
-        verbose_name='時間（分）',
+        verbose_name='時間',
         default=0
     )
     description = models.TextField(

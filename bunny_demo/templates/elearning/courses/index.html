@@ -13,8 +13,9 @@
           <th>講座名</th>
           <th>Collection ID</th>
           <th>動画数</th>
-          <th>コース時間（分）</th>
-          <th>動画進捗</th>
+          <th>コース時間</th>
+          <th>コース進捗</th>
+          <th>メニュー</th>
         </thead>
         <tbody>
           {% for course in object_list %}
@@ -25,8 +26,9 @@
             </td>
             <td>{{ course.bunny_collection_id }}</td>
             <td>{{ course.video_count }}</td>
-            <td>{{ course.total_duration }}</td>
+            <td>{{ course.get_total_duration| seconds_to_time_str }}</td>
             <td>{{ course|call_get_course_progress:request.user }}%</td>
+            <td><a href="{% url 'course_update' course.pk %}">コース情報編集</a></td>
           </tr>
           {% endfor %}
         </tbody>

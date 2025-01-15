@@ -54,6 +54,20 @@ class BunnyCDNStream:
 			return json.loads(response.text)
 		except:
 			raise Exception("Failed to create collection")
+		
+	def update_collection(self, collection_id, title):
+		"""
+			Update collection title.
+		"""
+		url = self._generate_base_url("/collections/" + collection_id)
+		payload = {"name": title}
+
+		response = requests.post(url, data=json.dumps(payload), headers=self._headers)
+		self._check_status_code(response.status_code)
+		try:
+			return json.loads(response.text)
+		except:
+			raise Exception("Failed to update collection")
 
 	def get_video(self, video_id):
 		"""
