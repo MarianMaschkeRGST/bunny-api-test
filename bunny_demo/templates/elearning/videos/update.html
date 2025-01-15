@@ -30,7 +30,8 @@
             </div>
         </div>
     </section>  
-    <button type="submit">Update</button>
+    <button type="submit">更新する</button>
+    <a href="{% url 'video_delete' object.course.pk object.pk %}">動画削除</a>
 </form>
 
     {% if messages %}

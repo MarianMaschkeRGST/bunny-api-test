@@ -48,6 +48,7 @@
           <td>{{ video | call_get_progress_for_user:request.user }}%</td>
           <td>
             <a href="{% url 'video_update' course.pk video.pk %}">動画情報変更</a>
+            <a href="{% url 'video_delete' course.pk video.pk %}">動画削除</a>
           </td>
         </tr>
         {% endfor%}

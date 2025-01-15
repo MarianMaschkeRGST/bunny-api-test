@@ -11,7 +11,7 @@ from django.db.models import Count, Sum
 from django_filters.views import FilterView
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.generic import CreateView, DetailView, TemplateView, DeleteView, View
+from django.views.generic import CreateView, DetailView, DeleteView, View
 from django.views.generic.edit import FormView, UpdateView
 from django.views.decorators.http import require_http_methods
 
@@ -213,7 +213,37 @@ class VideoDetailView(LoginRequiredMixin, DetailView):
         return Video.objects.filter(
             course_id=self.kwargs['pk']
         ).select_related('course')
-
+    
+class VideoDeleteView(LoginRequiredMixin, DeleteView):
+    model = Video
+    template_name = 'elearning/videos/delete.html'
+    pk_url_kwarg = 'video_pk'
+    
+    def get_object(self, queryset=None):
+        course_id = self.kwargs.get('pk')
+        video_id = self.kwargs.get('video_pk')
+        return get_object_or_404(Video, course_id=course_id, id=video_id)
+    
+    def get_success_url(self):
+        return reverse('course_detail', kwargs={'pk': self.kwargs.get('pk')})
+    
+    def post(self, request, *args, **kwargs):
+        video = self.get_object()
+        try:
+            stream_library_id = os.getenv('BUNNYCDN_LIBRARY_ID', '')
+            api_key = os.getenv('BUNNYCDN_API_KEY', '')
+            client = BunnyCDNStream(stream_library_id, api_key)
+            
+            # Delete bunny video before model
+            client.delete_video(video.bunny_video_id)
+            
+            # Delete model
+            messages.success(request, f'Video "{video.title}" was successfully deleted.')
+            return super().post(request, *args, **kwargs)
+            
+        except Exception as e:
+            messages.error(request, f'Failed to delete video: {str(e)}')
+            return redirect('video_detail', pk=video.course.id, video_pk=video.id)
 
 class VideoProgressUpdateView(LoginRequiredMixin, View):
     def post(self, request, pk, video_pk):
